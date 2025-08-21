@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lens of Change | Film & Storytelling for Social Impact</title>
+  <meta name="description" content="Lens of Change is a scalable film & digital storytelling platform amplifying Northern Nigerian narratives for social impact." />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+
+  <!-- Tailwind CSS (CDN) - preflight disabled to avoid conflicts with Bootstrap) -->
+  <script>
+    window.tailwind = window.tailwind || {};
+    tailwind.config = {
+      darkMode: 'class',
+      corePlugins: { preflight: false },
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Outfit', 'system-ui', 'sans-serif'],
+            body: ['Inter', 'system-ui', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#eef6ff',
+              100: '#d9eaff',
+              200: '#b4d3ff',
+              300: '#86b5ff',
+              400: '#4d8dff',
+              500: '#1f6bff',
+              600: '#0f56e0',
+              700: '#0b44b4',
+              800: '#0c3a92',
+              900: '#0e326f'
+            }
+          },
+          boxShadow: {
+            glow: '0 0 0 0 rgba(79,70,229,0.0), 0 10px 40px rgba(31,107,255,0.25)'
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+  <!-- Custom CSS (scoped) -->
+  <style>
+    :root {
+      --brand: #1f6bff;
+      --brand-dark: #0e326f;
+      --ink: #0f172a; /* slate-900 */
+      --ink-2: #1e293b; /* slate-800 */
+      --muted: #64748b; /* slate-500 */
+      --bg: #0b1220;    /* deep slate */
+      --card: #0f172a;  /* slate-900 */
+      --ring: rgba(31,107,255,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: var(--ink); }
+
+    /* Hero background with subtle animated grain */
+    .hero {
+      position: relative; min-height: 92vh; display: grid; place-items: center;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(79,70,229,.08), transparent),
+                  radial-gradient(1000px 400px at 90% 20%, rgba(31,107,255,.09), transparent),
+                  linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+      overflow: hidden;
+    }
+    .hero::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .16;
+      background-image: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">\
+        <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter>\
+        <rect width="100%" height="100%" filter="url(%23n)" opacity="0.35"/>\
+      </svg>');
+      mix-blend-mode: soft-light;
+    }
+
+    .btn-brand {
+      background: linear-gradient(135deg, var(--brand) 0%, #4d8dff 100%);
+      color: #fff !important; border: 0; box-shadow: 0 10px 30px rgba(31,107,255,.35);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .btn-brand:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(31,107,255,.45); }
+
+    .glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); }
+
+    .section-title { letter-spacing: .01em; }
+    .section-sub { color: var(--muted); max-width: 64ch; }
+
+    /* Card tweaks */
+    .card-custom { background: #0f172a; border: 1px solid rgba(255,255,255,0.08); }
+    .card-custom:hover { border-color: rgba(77,141,255,.65); box-shadow: 0 10px 40px rgba(77,141,255,.08); }
+
+    /* Gallery filter */
+    .filter-btn.active { background-color: var(--brand); color: #fff; }
+
+    /* Footer link hover */
+    .link-muted { color: #cbd5e1; text-decoration: none; }
+    .link-muted:hover { color: #fff; text-decoration: underline; }
+
+    /* Accessibility outline */
+    :focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-radius: 8px; }
+
+    /* Simple keyframes */
+    @keyframes floaty { 0% { transform: translateY(0) } 50% { transform: translateY(-8px) } 100% { transform: translateY(0) } }
+    .floaty { animation: floaty 6s ease-in-out infinite; }
+
+    /* Small utility for clamped headings */
+    .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Toast position */
+    #toastArea { position: fixed; inset: auto 1rem 1rem auto; z-index: 1080; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <!-- =================== NAVBAR =================== -->
+  <nav class="navbar navbar-dark navbar-expand-lg sticky-top" style="background: rgba(2,6,23,.8); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,.06)">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#home" aria-label="Lens of Change home">
+        <i class="bi bi-camera-reels-fill fs-4 text-primary"></i>
+        <span class="fw-semibold" style="letter-spacing:.3px">Lens of Change</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#programs">Programs</a></li>
+          <li class="nav-item"><a class="nav-link" href="#gallery">Stories</a></li>
+          <li class="nav-item"><a class="nav-link" href="#impact">Impact</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+        <div class="d-none d-lg-flex ms-3 gap-2">
+          <a href="#apply" class="btn btn-sm btn-brand px-3">Apply</a>
+          <a href="#donate" class="btn btn-sm btn-outline-light px-3 border-opacity-25">Donate</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- =================== HERO =================== -->
+  <header id="home" class="hero text-center text-slate-100">
+    <div class="container position-relative z-10">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+          <div class="p-4 p-md-5 rounded-4 glass border border-opacity-10">
+            <div class="mb-4">
+              <span class="badge rounded-pill bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 px-3 py-2">Film • Storytelling • Social Impact</span>
+            </div>
+            <h1 class="display-5 fw-bold lh-tight font-display">
+              Amplifying Northern Narratives through <span class="text-primary">Film</span> & <span class="text-primary">Digital Storytelling</span>
+            </h1>
+            <p class="lead text-slate-300 mt-3 mx-auto" style="max-width: 70ch">
+              We train emerging filmmakers, fund short impact films, and take stories to communities that need them most. Built to scale across states and online.
+            </p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+              <a href="#programs" class="btn btn-brand btn-lg px-4">Explore Programs</a>
+              <a href="#trailer" class="btn btn-outline-light btn-lg px-4 border-opacity-25" data-bs-toggle="modal" data-bs-target="#videoModal">
+                <i class="bi bi-play-fill me-1"></i> Watch Trailer
+              </a>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center gap-4 mt-5">
+              <div class="text-center">
+                <div class="fs-2 fw-bold" data-counter="250">0</div>
+                <div class="text-slate-400 small">Creatives Trained</div>
+              </div>
+              <div class="text-center">
+                <div class="fs-2 fw-bold" data-counter="32">0</div>
+                <div class="text-slate-400 small">Films Produced</div>
+              </div>
+              <div class="text-center">
+                <div class="fs-2 fw-bold" data-counter="54000">0</div>
+                <div class="text-slate-400 small">Audience Reached</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- floating decorative shapes -->
+    <div class="position-absolute top-0 start-50 translate-middle-x floaty" aria-hidden="true">
+      <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="110" cy="110" r="80" stroke="rgba(77,141,255,.35)" stroke-width="2" />
+        <circle cx="110" cy="110" r="60" stroke="rgba(77,141,255,.25)" stroke-width="2" />
+        <circle cx="110" cy="110" r="40" stroke="rgba(77,141,255,.2)" stroke-width="2" />
+      </svg>
+    </div>
+  </header>
+
+  <!-- =================== ABOUT =================== -->
+  <section id="about" class="py-5 py-md-6">
+    <div class="container">
+      <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-12 col-lg-6 order-lg-2">
+          <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg">
+            <img src="./assets/1.png" alt="Community cinema screening under open sky" class="w-100 h-100 object-fit-cover" />
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <h2 class="section-title h1 fw-bold font-display">About <span class="text-primary">Lens of Change</span></h2>
+          <p class="section-sub mt-3">
+            Lens of Change is a social impact platform that equips Northern Nigerian creatives with skills and resources to tell authentic stories. We combine training, production grants, and community screenings to strengthen the regional film ecosystem while preserving cultural heritage.
+          </p>
+          <div class="row g-3 mt-4">
+            <div class="col-12 col-md-6">
+              <div class="card card-custom rounded-4 p-3 h-100">
+                <div class="d-flex gap-3 align-items-start">
+                  <div class="p-2 rounded-3 bg-primary bg-opacity-10 text-primary"><i class="bi bi-magic fs-4"></i></div>
+                  <div>
+                    <h5 class="mb-1">Train</h5>
+                    <p class="text-slate-300 small mb-0">Bootcamps, masterclasses, and a train-the-trainer model for scale.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="card card-custom rounded-4 p-3 h-100">
+                <div class="d-flex gap-3 align-items-start">
+                  <div class="p-2 rounded-3 bg-success bg-opacity-10 text-success"><i class="bi bi-camera-reels fs-4"></i></div>
+                  <div>
+                    <h5 class="mb-1">Produce</h5>
+                    <p class="text-slate-300 small mb-0">Micro-grants and mentorship to create short films & documentaries.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="card card-custom rounded-4 p-3 h-100">
+                <div class="d-flex gap-3 align-items-start">
+                  <div class="p-2 rounded-3 bg-warning bg-opacity-10 text-warning"><i class="bi bi-broadcast-pin fs-4"></i></div>
+                  <div>
+                    <h5 class="mb-1">Screen</h5>
+                    <p class="text-slate-300 small mb-0">Mobile cinema caravan bringing stories to schools and rural communities.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="card card-custom rounded-4 p-3 h-100">
+                <div class="d-flex gap-3 align-items-start">
+                  <div class="p-2 rounded-3 bg-info bg-opacity-10 text-info"><i class="bi bi-cloud-arrow-up fs-4"></i></div>
+                  <div>
+                    <h5 class="mb-1">Archive</h5>
+                    <p class="text-slate-300 small mb-0">Digital platform with multilingual subtitles to reach global audiences.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-4">
+            <a href="#gallery" class="btn btn-outline-light border-opacity-25 px-4">View Stories</a>
+            <a href="#contact" class="btn btn-brand px-4">Partner with Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PROGRAMS =================== -->
+  <section id="programs" class="py-5 py-md-6 border-top border-opacity-10">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="h1 fw-bold font-display section-title">Programs that Scale</h2>
+        <p class="section-sub mx-auto mt-2">Built for replication across states and continuous cohort growth.</p>
+      </div>
+      <div class="row g-4">
+        <!-- Program 1 -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?film,workshop" alt="Hands-on film workshop" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold">Storytelling Bootcamps</h5>
+              <p class="text-slate-300 small">Script, cinematography, editing, and sound—with industry mentors and project-based learning.</p>
+              <ul class="small text-slate-300 mb-3">
+                <li>4-week hybrid format</li>
+                <li>Train-the-trainer replication</li>
+                <li>Scholarships for women & rural youth</li>
+              </ul>
+              <a href="#apply" class="btn btn-outline-light border-opacity-25 btn-sm">Apply</a>
+            </div>
+          </div>
+        </div>
+        <!-- Program 2 -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?camera,cinematography" alt="Camera close-up" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold">Production Micro‑Grants</h5>
+              <p class="text-slate-300 small">Seed grants plus production mentorship to create short films on social themes.</p>
+              <ul class="small text-slate-300 mb-3">
+                <li>Up to ₦1,000,000 per project</li>
+                <li>Ethical storytelling standards</li>
+                <li>Distribution & festival support</li>
+              </ul>
+              <a href="#apply" class="btn btn-outline-light border-opacity-25 btn-sm">Submit Pitch</a>
+            </div>
+          </div>
+        </div>
+        <!-- Program 3 -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?outdoor,screening" alt="Outdoor community screening" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold">Community Film Caravan</h5>
+              <p class="text-slate-300 small">A mobile cinema touring schools and rural towns, with post‑screening dialogues.</p>
+              <ul class="small text-slate-300 mb-3">
+                <li>Solar‑powered projection</li>
+                <li>Hausa/English subtitles</li>
+                <li>Impact discussion toolkits</li>
+              </ul>
+              <a href="#contact" class="btn btn-outline-light border-opacity-25 btn-sm">Host the Caravan</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== GALLERY / STORIES =================== -->
+  <section id="gallery" class="py-5 py-md-6">
+    <div class="container">
+      <div class="text-center mb-4">
+        <h2 class="h1 fw-bold font-display section-title">Featured Stories</h2>
+        <p class="section-sub mx-auto">A living gallery of short films and documentaries from emerging Northern voices.</p>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+        <button class="btn btn-sm btn-outline-light border-opacity-25 filter-btn active" data-filter="all">All</button>
+        <button class="btn btn-sm btn-outline-light border-opacity-25 filter-btn" data-filter="women">Women</button>
+        <button class="btn btn-sm btn-outline-light border-opacity-25 filter-btn" data-filter="youth">Youth</button>
+        <button class="btn btn-sm btn-outline-light border-opacity-25 filter-btn" data-filter="climate">Climate</button>
+        <button class="btn btn-sm btn-outline-light border-opacity-25 filter-btn" data-filter="heritage">Heritage</button>
+      </div>
+
+      <!-- Grid -->
+      <div class="row g-4" id="storyGrid">
+        <!-- Card 1 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="women">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?hausa,woman,portrait" alt="Portrait of a Northern woman storyteller" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">Threads of Tomorrow</h5>
+              <p class="text-slate-300 small">Young women reviving textile crafts while charting new careers in design.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="Threads of Tomorrow" data-video="https://www.youtube.com/embed/ysz5S6PUM-U">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="youth">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?youth,film,africa" alt="Young filmmakers on set" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">The First Take</h5>
+              <p class="text-slate-300 small">A cohort’s first short films—stories of courage, friendship, and identity.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="The First Take" data-video="https://www.youtube.com/embed/dQw4w9WgXcQ">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="climate">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?sahel,desert,trees" alt="Sahel landscape with resilient trees" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">Rain Will Come</h5>
+              <p class="text-slate-300 small">Communities adapt to climate stress with indigenous knowledge and grit.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="Rain Will Come" data-video="https://www.youtube.com/embed/ysz5S6PUM-U">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="heritage">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?nigeria,festival" alt="Cultural festival" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">Echoes of Home</h5>
+              <p class="text-slate-300 small">Elders and youth co-create a living archive of songs and stories.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="Echoes of Home" data-video="https://www.youtube.com/embed/ysz5S6PUM-U">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="women">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?leather,artisan,nigeria" alt="Leather artisan at work" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">Stitch by Stitch</h5>
+              <p class="text-slate-300 small">Mothers and daughters turning crafts into new possibilities.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="Stitch by Stitch" data-video="https://www.youtube.com/embed/dQw4w9WgXcQ">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 6 -->
+        <div class="col-12 col-md-6 col-lg-4 story-item" data-cat="climate">
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?river,community,africa" alt="Community by a river" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">River, Remember</h5>
+              <p class="text-slate-300 small">Water, memory, and migration along the river that shaped a town.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="River, Remember" data-video="https://www.youtube.com/embed/ysz5S6PUM-U">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load more (frontend demo) -->
+      <div class="text-center mt-4">
+        <button id="loadMore" class="btn btn-outline-light border-opacity-25">Load More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== IMPACT / TIMELINE =================== -->
+  <section id="impact" class="py-5 py-md-6 border-top border-opacity-10">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-12 col-lg-6">
+          <h2 class="h1 fw-bold font-display">Impact & Growth Timeline</h2>
+          <p class="section-sub mt-2">We measure learning outcomes, film quality, community engagement, and policy influence.</p>
+          <ul class="list-unstyled mt-4">
+            <li class="d-flex gap-3 align-items-start mb-3">
+              <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Year 1</span>
+              <span class="text-slate-300">Pilot in Katsina & Kaduna • Train 100 creatives • 10 films • 20,000+ audience</span>
+            </li>
+            <li class="d-flex gap-3 align-items-start mb-3">
+              <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Year 2</span>
+              <span class="text-slate-300">Replicate to Sokoto & Kano • 15 films • Festival launch • Digital archive</span>
+            </li>
+            <li class="d-flex gap-3 align-items-start mb-3">
+              <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Year 3</span>
+              <span class="text-slate-300">Northwest-wide trainers network • 20 films • 50,000+ audience</span>
+            </li>
+          </ul>
+          <div class="mt-4">
+            <a href="#contact" class="btn btn-brand px-4">Discuss Partnerships</a>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="card card-custom rounded-4 p-4 text-center h-100">
+                <i class="bi bi-people fs-2 text-primary"></i>
+                <div class="mt-2 fw-bold fs-4" data-counter="100">0</div>
+                <div class="small text-slate-300">Annual Fellows</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card card-custom rounded-4 p-4 text-center h-100">
+                <i class="bi bi-film fs-2 text-primary"></i>
+                <div class="mt-2 fw-bold fs-4" data-counter="10">0</div>
+                <div class="small text-slate-300">Films / Year</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card card-custom rounded-4 p-4 text-center h-100">
+                <i class="bi bi-broadcast fs-2 text-primary"></i>
+                <div class="mt-2 fw-bold fs-4" data-counter="120">0</div>
+                <div class="small text-slate-300">Screenings</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card card-custom rounded-4 p-4 text-center h-100">
+                <i class="bi bi-globe2 fs-2 text-primary"></i>
+                <div class="mt-2 fw-bold fs-4" data-counter="3">0</div>
+                <div class="small text-slate-300">Languages</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== TESTIMONIALS =================== -->
+  <section class="py-5 py-md-6">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="h1 fw-bold font-display">What People Say</h2>
+        <p class="section-sub mx-auto">Voices from fellows, mentors, and community partners.</p>
+      </div>
+
+      <div id="testi" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <div class="row justify-content-center">
+              <div class="col-12 col-lg-8">
+                <div class="card card-custom rounded-4 p-4 p-md-5 text-center">
+                  <img src="https://source.unsplash.com/120x120/?portrait,african" alt="Fellow portrait" class="rounded-circle mx-auto mb-3" width="80" height="80" />
+                  <p class="lead text-slate-300">“The program transformed my approach to storytelling. Our film screened in three towns and sparked real conversations.”</p>
+                  <div class="fw-semibold">Aisha, Fellow</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="row justify-content-center">
+              <div class="col-12 col-lg-8">
+                <div class="card card-custom rounded-4 p-4 p-md-5 text-center">
+                  <img src="https://source.unsplash.com/120x120/?mentor,portrait" alt="Mentor portrait" class="rounded-circle mx-auto mb-3" width="80" height="80" />
+                  <p class="lead text-slate-300">“A thoughtful ecosystem model—training, funding, and community screenings all in one pipeline.”</p>
+                  <div class="fw-semibold">Ibrahim, Mentor</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="row justify-content-center">
+              <div class="col-12 col-lg-8">
+                <div class="card card-custom rounded-4 p-4 p-md-5 text-center">
+                  <img src="https://source.unsplash.com/120x120/?community,portrait" alt="Community partner portrait" class="rounded-circle mx-auto mb-3" width="80" height="80" />
+                  <p class="lead text-slate-300">“The caravan brought films to our school. Students saw themselves on screen—powerful and inspiring.”</p>
+                  <div class="fw-semibold">Maryam, Teacher</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#testi" data-bs-slide="prev" aria-label="Previous">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#testi" data-bs-slide="next" aria-label="Next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PARTNERS =================== -->
+  <section class="py-5 py-md-6 border-top border-opacity-10">
+    <div class="container">
+      <div class="text-center mb-4">
+        <h2 class="h1 fw-bold font-display">Partners & Supporters</h2>
+        <p class="section-sub mx-auto">We collaborate with hubs, NGOs, cultural boards, and funders.</p>
+      </div>
+      <div class="row g-3 align-items-center justify-content-center text-center">
+        <div class="col-6 col-md-3"><img src="https://dummyimage.com/220x60/1f2937/fff&text=Partner+1" alt="Partner 1" class="opacity-75" /></div>
+        <div class="col-6 col-md-3"><img src="https://dummyimage.com/220x60/1f2937/fff&text=Partner+2" alt="Partner 2" class="opacity-75" /></div>
+        <div class="col-6 col-md-3"><img src="https://dummyimage.com/220x60/1f2937/fff&text=Partner+3" alt="Partner 3" class="opacity-75" /></div>
+        <div class="col-6 col-md-3"><img src="https://dummyimage.com/220x60/1f2937/fff&text=Partner+4" alt="Partner 4" class="opacity-75" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== FAQ =================== -->
+  <section class="py-5 py-md-6" id="faq">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-12 col-lg-5">
+          <h2 class="h1 fw-bold font-display">Frequently Asked Questions</h2>
+          <p class="section-sub">Everything you need to know about eligibility, programs, and support.</p>
+        </div>
+        <div class="col-12 col-lg-7">
+          <div class="accordion" id="faqAcc">
+            <div class="accordion-item bg-transparent text-slate-100 border border-opacity-10 rounded-3 overflow-hidden">
+              <h2 class="accordion-header" id="f1">
+                <button class="accordion-button collapsed bg-transparent text-slate-100" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-expanded="false" aria-controls="c1">Who can apply?</button>
+              </h2>
+              <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                <div class="accordion-body text-slate-300">Emerging filmmakers and storytellers based in Northern Nigeria. We prioritize women, rural youth, and first-time directors.</div>
+              </div>
+            </div>
+            <div class="accordion-item bg-transparent text-slate-100 border border-opacity-10 rounded-3 overflow-hidden mt-3">
+              <h2 class="accordion-header" id="f2">
+                <button class="accordion-button collapsed bg-transparent text-slate-100" type="button" data-bs-toggle="collapse" data-bs-target="#c2" aria-expanded="false" aria-controls="c2">Do you fund equipment?</button>
+              </h2>
+              <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                <div class="accordion-body text-slate-300">Micro‑grants primarily support production costs and mentorship. We also facilitate equipment access via partner pools.</div>
+              </div>
+            </div>
+            <div class="accordion-item bg-transparent text-slate-100 border border-opacity-10 rounded-3 overflow-hidden mt-3">
+              <h2 class="accordion-header" id="f3">
+                <button class="accordion-button collapsed bg-transparent text-slate-100" type="button" data-bs-toggle="collapse" data-bs-target="#c3" aria-expanded="false" aria-controls="c3">Where are screenings held?</button>
+              </h2>
+              <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                <div class="accordion-body text-slate-300">In schools, community centers, and open-air venues through our mobile caravan setup with subtitles and discussion guides.</div>
+              </div>
+            </div>
+            <div class="accordion-item bg-transparent text-slate-100 border border-opacity-10 rounded-3 overflow-hidden mt-3">
+              <h2 class="accordion-header" id="f4">
+                <button class="accordion-button collapsed bg-transparent text-slate-100" type="button" data-bs-toggle="collapse" data-bs-target="#c4" aria-expanded="false" aria-controls="c4">Is there a fee to participate?</button>
+              </h2>
+              <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                <div class="accordion-body text-slate-300">No. Programs are scholarship‑backed with selection via open calls and community referrals.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== CONTACT =================== -->
+  <section id="contact" class="py-5 py-md-6 border-top border-opacity-10">
+    <div class="container">
+      <div class="row g-5 align-items-start">
+        <div class="col-12 col-lg-6">
+          <h2 class="h1 fw-bold font-display">Contact & Partnerships</h2>
+          <p class="section-sub">We’d love to collaborate with funders, hubs, schools, and cultural boards across the region.</p>
+          <div class="d-flex flex-column gap-2 mt-3">
+            <div><i class="bi bi-envelope me-2 text-primary"></i> hello@lensofchange.org</div>
+            <div><i class="bi bi-geo-alt me-2 text-primary"></i> Katsina • Kano • Kaduna (Nigeria)</div>
+            <div><i class="bi bi-clock me-2 text-primary"></i> Mon–Fri, 9:00–17:00 (WAT)</div>
+          </div>
+          <div class="mt-4">
+            <h6 class="text-slate-300">Follow</h6>
+            <div class="d-flex gap-3">
+              <a class="link-muted" href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+              <a class="link-muted" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+              <a class="link-muted" href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <form id="contactForm" class="card card-custom rounded-4 p-4 p-md-5">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">First name</label>
+                <input type="text" class="form-control bg-transparent text-slate-100 border-secondary" name="firstName" required />
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Last name</label>
+                <input type="text" class="form-control bg-transparent text-slate-100 border-secondary" name="lastName" required />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control bg-transparent text-slate-100 border-secondary" name="email" required />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Message</label>
+                <textarea class="form-control bg-transparent text-slate-100 border-secondary" name="message" rows="4" required></textarea>
+              </div>
+              <div class="col-12 d-flex align-items-center gap-2">
+                <input class="form-check-input" type="checkbox" id="consent" required />
+                <label for="consent" class="small text-slate-300">I agree to be contacted about programs and opportunities.</label>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-brand w-100" type="submit">Send Message</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== FOOTER =================== -->
+  <footer class="pt-5 pb-4 border-top border-opacity-10">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-12 col-lg-6">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-camera-reels-fill fs-4 text-primary"></i>
+            <div>
+              <div class="fw-semibold">Lens of Change</div>
+              <div class="text-slate-400 small">Film & Storytelling for Social Impact</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 text-lg-end">
+          <a class="link-muted me-3" href="#about">About</a>
+          <a class="link-muted me-3" href="#programs">Programs</a>
+          <a class="link-muted me-3" href="#gallery">Stories</a>
+          <a class="link-muted" href="#contact">Contact</a>
+        </div>
+      </div>
+      <div class="text-center text-slate-500 small mt-3">© <span id="year"></span> Lens of Change. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- =================== MODALS =================== -->
+  <!-- Trailer Modal -->
+  <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-slate-900 border border-opacity-10">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Lens of Change — Trailer</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <div class="ratio ratio-16x9">
+            <iframe id="trailerFrame" src="" title="Trailer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Story Watch Modal -->
+  <div class="modal fade" id="storyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-slate-900 border border-opacity-10">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="storyTitle">Story</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <div class="ratio ratio-16x9">
+            <iframe id="storyFrame" src="" title="Story Player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Area -->
+  <div id="toastArea"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <!-- App JS -->
+  <script>
+    // ===== Utilities =====
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+    // Current year in footer
+    $('#year').textContent = new Date().getFullYear();
+
+    // ===== Counters on view =====
+    const counters = $$('[data-counter]');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target; const target = +el.getAttribute('data-counter');
+          const duration = 1600; // ms
+          const start = performance.now();
+          const step = now => {
+            const p = Math.min(1, (now - start)/duration);
+            el.textContent = Math.floor(p * target).toLocaleString();
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.3 });
+    counters.forEach(c => io.observe(c));
+
+    // ===== Gallery filter =====
+    const filterBtns = $$('.filter-btn');
+    const items = $$('#storyGrid .story-item');
+    filterBtns.forEach(btn => btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      items.forEach(card => {
+        const show = (f === 'all' || card.dataset.cat === f);
+        card.style.display = show ? '' : 'none';
+      });
+    }));
+
+    // ===== Load more (demo) =====
+    const loadMoreBtn = $('#loadMore');
+    let loadedExtra = false;
+    loadMoreBtn?.addEventListener('click', () => {
+      if (loadedExtra) return;
+      const frag = document.createDocumentFragment();
+      for (let i=0;i<6;i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'col-12 col-md-6 col-lg-4 story-item';
+        wrap.setAttribute('data-cat', ['women','youth','climate','heritage'][i%4]);
+        wrap.innerHTML = `
+          <div class="card card-custom rounded-4 h-100 overflow-hidden">
+            <img src="https://source.unsplash.com/800x600/?story,africa,${i}" alt="Story still ${i+1}" class="w-100" />
+            <div class="p-4">
+              <h5 class="fw-semibold clamp-2">New Story ${i+1}</h5>
+              <p class="text-slate-300 small">A fresh perspective from our fellows network.</p>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-sm btn-brand" data-bs-toggle="modal" data-bs-target="#storyModal" data-title="New Story ${i+1}" data-video="https://www.youtube.com/embed/ysz5S6PUM-U">Watch</button>
+                <a href="#" class="btn btn-sm btn-outline-light border-opacity-25">Synopsis</a>
+              </div>
+            </div>
+          </div>`;
+        frag.appendChild(wrap);
+      }
+      $('#storyGrid').appendChild(frag);
+      loadedExtra = true;
+      // Show toast
+      showToast('Loaded 6 more stories');
+    });
+
+    // ===== Modal video handling (Trailer) =====
+    const trailerModal = document.getElementById('videoModal');
+    const trailerFrame = document.getElementById('trailerFrame');
+    trailerModal?.addEventListener('show.bs.modal', () => {
+      trailerFrame.src = 'https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1&rel=0';
+    });
+    trailerModal?.addEventListener('hidden.bs.modal', () => { trailerFrame.src = ''; });
+
+    // ===== Story modal handling =====
+    const storyModal = document.getElementById('storyModal');
+    const storyFrame = document.getElementById('storyFrame');
+    const storyTitle = document.getElementById('storyTitle');
+    storyModal?.addEventListener('show.bs.modal', evt => {
+      const trigger = evt.relatedTarget;
+      if (!trigger) return;
+      const video = trigger.getAttribute('data-video');
+      const title = trigger.getAttribute('data-title');
+      storyFrame.src = video + '?autoplay=1&rel=0';
+      storyTitle.textContent = title || 'Story';
+    });
+    storyModal?.addEventListener('hidden.bs.modal', () => { storyFrame.src=''; });
+
+    // ===== Contact form (demo only) =====
+    const contactForm = document.getElementById('contactForm');
+    contactForm?.addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(contactForm);
+      const payload = Object.fromEntries(formData.entries());
+      // Persist locally
+      localStorage.setItem('loc-contact', JSON.stringify(payload));
+      contactForm.reset();
+      showToast('Thanks! Your message has been received.');
+    });
+
+    // ===== Toast helper =====
+    function showToast(message) {
+      const id = 't' + Math.random().toString(36).slice(2);
+      const el = document.createElement('div');
+      el.className = 'toast align-items-center text-bg-dark border-0 show';
+      el.setAttribute('role','alert'); el.setAttribute('aria-live','assertive'); el.setAttribute('aria-atomic','true');
+      el.id = id;
+      el.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">${message}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>`;
+      document.getElementById('toastArea').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+  </script>
+</body>
+</html>
